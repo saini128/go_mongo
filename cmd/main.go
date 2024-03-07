@@ -14,7 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Define a data structure representing your entity (e.g., a Person)
 type Person struct {
 	ID      primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	Name    string             `json:"name"`
@@ -22,7 +21,6 @@ type Person struct {
 	Address string             `json:"address"`
 }
 
-// MongoDB configuration
 const (
 	Host       = "mongodb://127.0.0.1:27017"
 	Database   = "testdb"
