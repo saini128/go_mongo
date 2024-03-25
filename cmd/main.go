@@ -3,11 +3,14 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -22,7 +25,6 @@ type Person struct {
 }
 
 const (
-	Host       = "mongodb://127.0.0.1:27017"
 	Database   = "testdb"
 	Collection = "people"
 )
@@ -30,16 +32,20 @@ const (
 var client *mongo.Client
 
 func init() {
-	var err error
-
-	client, err = mongo.NewClient(options.Client().ApplyURI(Host))
-	if err != nil {
-		log.Fatal("Error creating MongoDB client:", err)
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
 	}
-
+	uri := os.Getenv("URI")
+	if uri == "" {
+		log.Fatal("MONGODB_URI environment variable is not set")
+	}
+	var err error
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	fmt.Println(os.Getenv("URI"))
+	opts := options.Client().ApplyURI(os.Getenv("URI")).SetServerAPIOptions(serverAPI)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	err = client.Connect(ctx)
+	client, err = mongo.Connect(context.TODO(), opts)
 	if err != nil {
 		log.Fatal("Error connecting to MongoDB:", err)
 	}
